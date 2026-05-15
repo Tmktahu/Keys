@@ -1,0 +1,706 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Keys</AssemblyName>
+    <Version>1.0.0</Version>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <RestoreSources>
+      https://api.nuget.org/v3/index.json;
+      https://nuget.bepinex.dev/v3/index.json;
+    </RestoreSources>
+    <BepInExPluginGuid>io.vrising.Keys</BepInExPluginGuid>
+    <LangVersion>preview</LangVersion>
+    <VRisingServerPath>T:\SteamLibrary\steamapps\common\VRisingDedicatedServer</VRisingServerPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
+    <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.733" IncludeAssets="compile" />
+    <PackageReference Include="VRising.VampireCommandFramework" Version="*" />
+  </ItemGroup>
+
+  <Target Name="BuildToClient" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(VRisingServerPath)\BepInEx\plugins" />
+  </Target>
+
+  <ItemGroup>
+    <Reference Include='Backtrace.Unity'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Backtrace.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='com.rlabrecque.steamworks.net'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/com.rlabrecque.steamworks.net.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='com.stunlock.network.eos'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/com.stunlock.network.eos.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='com.stunlock.platform'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/com.stunlock.platform.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='com.stunlock.platform.pc'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/com.stunlock.platform.pc.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppMono.Security'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppMono.Security.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2Cppmscorlib'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2Cppmscorlib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Configuration'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Configuration.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Core'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Data'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Data.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Drawing'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Drawing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Net.Http'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Net.Http.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Numerics'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Numerics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Runtime.CompilerServices.Unsafe'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Runtime.Serialization'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Runtime.Serialization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Xml'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Xml.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Il2CppSystem.Xml.Linq'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Il2CppSystem.Xml.Linq.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Lidgren.Network'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Lidgren.Network.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='MagicaCloth'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/MagicaCloth.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Malee.ReorderableList'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Malee.ReorderableList.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Newtonsoft.Json'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Behaviours'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Behaviours.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Camera'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Camera.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.CastleBuilding.Systems'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.CastleBuilding.Systems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.CastleDyeSystem'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.CastleDyeSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.CodeGeneration'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.CodeGeneration.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Conversion'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Conversion.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.DualsensePC'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.DualsensePC.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Editor.SampleHandler'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Editor.SampleHandler.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Gameplay.Scripting'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Gameplay.Scripting.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Gameplay.Systems'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Gameplay.Systems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.GeneratedNetCode'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.GeneratedNetCode.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Haptics'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Haptics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.HUD'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.HUD.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Hybrid.Performance'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Hybrid.Performance.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.LiveBuildPerformanceTests.GlowingVampire'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.LiveBuildPerformanceTests.GlowingVampire.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.LiveBuildPerformanceTests.Utilities'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.LiveBuildPerformanceTests.Utilities.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Misc.Systems'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Misc.Systems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Pathfinding'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Pathfinding.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.PerformanceTests.Editor'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.PerformanceTests.Editor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Presentation.Systems'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Presentation.Systems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Roofs'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Roofs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.ScriptableSystems'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.ScriptableSystems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Shared.ColorData'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Shared.ColorData.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Shared'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Shared.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Shared.Systems'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Shared.Systems.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Steam'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Steam.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Terrain'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Terrain.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.VFXRendererUtility'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.VFXRendererUtility.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='ProjectM.Wind.Shared'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/ProjectM.Wind.Shared.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='RCONServerLib'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/RCONServerLib.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='RootMotion'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/RootMotion.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='RTLTMPro'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/RTLTMPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Rukhanka.DebugDrawer'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Rukhanka.DebugDrawer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Rukhanka.Hybrid'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Rukhanka.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Rukhanka.Runtime'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Rukhanka.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Rukhanka.Toolbox'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Rukhanka.Toolbox.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Sequencer'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Sequencer.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Animation.StunCloth.Runtime'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Animation.StunCloth.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Console'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Console.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.ContentTests'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.ContentTests.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Core.Animation'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Core.Animation.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Core'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Fmod'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Fmod.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Localization'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Localization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Metrics'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Metrics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Network'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Network.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Network.EosSdk'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Network.EosSdk.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Network.Lidgren'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Network.Lidgren.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Network.Steam'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Network.Steam.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Stunlock.Tools'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Stunlock.Tools.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Burst'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Burst.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Burst.Unsafe'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Burst.Unsafe.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Collections'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Collections.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Collections.LowLevel.ILSupport'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Deformations'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Deformations.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Entities'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Entities.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Entities.Graphics'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Entities.Graphics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Entities.Hybrid'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Entities.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Entities.Hybrid.HybridComponents'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Entities.Hybrid.HybridComponents.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.InputSystem'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.InputSystem.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.InputSystem.ForUI'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.InputSystem.ForUI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Mathematics'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Mathematics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Mathematics.Extensions'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Mathematics.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Mathematics.Extensions.Hybrid'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Mathematics.Extensions.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.MemoryProfiler'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.MemoryProfiler.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Physics'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Physics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Physics.Hybrid'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Physics.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Profiling.Core'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Profiling.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.RenderPipelines.Core.Runtime'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.RenderPipelines.HighDefinition.Config.Runtime'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.RenderPipelines.HighDefinition.Config.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.RenderPipelines.HighDefinition.Runtime'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.RenderPipelines.HighDefinition.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Scenes'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Scenes.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Serialization'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Serialization.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.TextMeshPro'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Transforms'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Transforms.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.Transforms.Hybrid'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.Transforms.Hybrid.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='Unity.VisualEffectGraph.Runtime'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/Unity.VisualEffectGraph.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.AccessibilityModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.AccessibilityModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.AIModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.AIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.AndroidJNIModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.AndroidJNIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.AnimationModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.AnimationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.AssetBundleModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.AssetBundleModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.AudioModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.AudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ClothModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ClothModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ClusterInputModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ClusterInputModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ClusterRendererModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ClusterRendererModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ContentLoadModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ContentLoadModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.CoreModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.CrashReportingModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.CrashReportingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.DirectorModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.DirectorModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.DSPGraphModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.DSPGraphModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.GameCenterModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.GameCenterModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.GIModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.GIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.GridModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.GridModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.HotReloadModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.HotReloadModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ImageConversionModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.IMGUIModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.InputLegacyModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.InputModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.InputModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.JSONSerializeModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.JSONSerializeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.LocalizationModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.LocalizationModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ParticleSystemModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ParticleSystemModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.PerformanceReportingModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.PerformanceReportingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.Physics2DModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.Physics2DModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.PhysicsModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.PhysicsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ProfilerModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ProfilerModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.PropertiesModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.PropertiesModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.ScreenCaptureModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.ScreenCaptureModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.SharedInternalsModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.SharedInternalsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.SpriteMaskModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.SpriteMaskModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.SpriteShapeModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.SpriteShapeModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.StreamingModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.StreamingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.SubstanceModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.SubstanceModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.SubsystemsModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.SubsystemsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TerrainModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TerrainModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TerrainPhysicsModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TerrainPhysicsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TextCoreFontEngineModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TextCoreTextEngineModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TextCoreTextEngineModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TextRenderingModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TilemapModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TilemapModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.TLSModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.TLSModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UI'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UIElementsModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UIElementsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UIModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UmbraModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UmbraModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityAnalyticsCommonModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityAnalyticsCommonModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityAnalyticsModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityAnalyticsModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityConnectModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityConnectModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityCurlModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityCurlModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityTestProtocolModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityTestProtocolModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityWebRequestAssetBundleModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityWebRequestAudioModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityWebRequestModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityWebRequestTextureModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.UnityWebRequestWWWModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.VehiclesModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.VehiclesModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.VFXModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.VFXModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.VideoModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.VideoModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.VirtualTexturingModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.VirtualTexturingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.VRModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.VRModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.WindModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.WindModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='UnityEngine.XRModule'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/UnityEngine.XRModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='VivoxUnity'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/VivoxUnity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include='__Generated'>
+      <HintPath>$(VRisingServerPath)/BepInEx/interop/__Generated.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

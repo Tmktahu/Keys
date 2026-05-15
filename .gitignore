@@ -1,0 +1,8 @@
+/bin
+/obj
+*.sln
+ReferenceItemGroup.txt
+AGENTS.md
+CLAUDE.md
+.claude
+.sln
