@@ -4,6 +4,7 @@ using Unity.Entities;
 using Keys.Models;
 using VampireCommandFramework;
 using Unity.Collections;
+using System.Text;
 
 namespace Keys.Services;
 
@@ -22,7 +23,7 @@ internal static class KeyManagementService
   {
     var clans = EntityService.GetEntitiesByComponentType<ClanTeam>();
     Entity targetClan = Entity.Null;
-    List<string> matchingGuids = new();
+    List<(Entity Entity, string Guid)> matchingClans = new();
 
     foreach (var clan in clans)
     {
@@ -38,14 +39,19 @@ internal static class KeyManagementService
 
       if (clanName.Equals(identifier, StringComparison.OrdinalIgnoreCase))
       {
-        matchingGuids.Add(clanGuid);
+        matchingClans.Add((clan, clanGuid));
       }
     }
 
-    if (targetClan.Equals(Entity.Null) && matchingGuids.Count > 0)
+    if (targetClan.Equals(Entity.Null) && matchingClans.Count == 1)
     {
-      var errorMsg = $"Ambiguous clan name: '{identifier}' matches {matchingGuids.Count} clans with GUIDs:\n";
-      errorMsg += string.Join("\n", matchingGuids.Select((guid, i) => $"  {i + 1}. {guid}"));
+      targetClan = matchingClans[0].Entity;
+    }
+
+    if (targetClan.Equals(Entity.Null) && matchingClans.Count > 1)
+    {
+      var errorMsg = $"Ambiguous clan name: '{identifier}' matches {matchingClans.Count} clans with GUIDs:\n";
+      errorMsg += string.Join("\n", matchingClans.Select((c, i) => $"  {i + 1}. {c.Guid}"));
       ctx.Reply(errorMsg);
       return Entity.Null;
     }
@@ -730,6 +736,185 @@ internal static class KeyManagementService
     }
 
     ctx.Reply($"Issued keys to {issueCount} members of clan '{effectiveClanName}'.");
+  }
+
+  public static void ListMine(ChatCommandContext ctx)
+  {
+    var userEntity = ctx.Event.SenderUserEntity;
+    var user = userEntity.Read<User>();
+    var playerData = GetPlayerData(user);
+
+    var keys = new List<(string ClanName, string ClanGuid, string KeyType)>();
+    foreach (var key in playerData.ClanKeys)
+    {
+      if (string.IsNullOrEmpty(key.ClanName) || string.IsNullOrEmpty(key.ClanGuid)) continue;
+      var keyType = key.IsOwnerKey ? "OWNER" : (key.CanIgnoreClanLimit ? "ADMIN (bypasses limits)" : "MEMBER");
+      keys.Add((key.ClanName, key.ClanGuid, keyType));
+    }
+
+    if (keys.Count == 0)
+    {
+      ctx.Reply("You have no keys.");
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.AppendLine("Keys you possess:");
+    foreach (var (clanName, clanGuid, keyType) in keys)
+    {
+      sb.AppendLine($"  Clan: {clanName} ({clanGuid}), Type: {keyType}");
+    }
+    sb.AppendLine("Use <color=green>.keys use \"Clan Name\"</color> to join a clan.");
+
+    ctx.Reply(sb.ToString());
+  }
+
+  public static void ListClan(ChatCommandContext ctx)
+  {
+    var userEntity = ctx.Event.SenderUserEntity;
+    var user = userEntity.Read<User>();
+
+    if (user.ClanEntity.Equals(NetworkedEntity.Empty))
+    {
+      ctx.Reply("You are not in a clan.");
+      return;
+    }
+
+    var clanEntity = user.ClanEntity.GetEntityOnServer();
+    var clanTeam = clanEntity.Read<ClanTeam>();
+    var clanName = clanTeam.Name.ToString();
+    var clanGuid = clanTeam.ClanGuid.ToString();
+
+    if (!IsClanRegistered(clanGuid))
+    {
+      ctx.Reply($"Clan '{clanName}' is not registered with the keys system. Use .keys register.");
+      return;
+    }
+
+    if (!CanIssueKeys(userEntity, clanGuid))
+    {
+      ctx.Reply("Only the clan owner can list keys.");
+      return;
+    }
+
+    var allKeys = GetKeysForClan(clanGuid);
+    if (allKeys.Count == 0)
+    {
+      ctx.Reply($"No keys issued for clan '{clanName}'.");
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.AppendLine($"Keys issued for clan '{clanName}':");
+    foreach (var (playeData, key) in allKeys)
+    {
+      var keyType = key.IsOwnerKey ? "OWNER" : (key.CanIgnoreClanLimit ? "ADMIN" : "MEMBER");
+      sb.AppendLine($"  {playeData.CharacterName} - {keyType}");
+    }
+
+    ctx.Reply(sb.ToString());
+  }
+
+  public static void ListAll(ChatCommandContext ctx)
+  {
+    var clanCounts = GetAllClansKeyCounts();
+
+    if (clanCounts.Count == 0)
+    {
+      ctx.Reply("No clans have been registered with keys.");
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.AppendLine("Clans registered with keys:");
+
+    foreach (var (clanGuid, count) in clanCounts.OrderByDescending(kv => kv.Value))
+    {
+      var clans = EntityService.GetEntitiesByComponentType<ClanTeam>();
+      string clanName = clanGuid;
+
+      foreach (var clan in clans)
+      {
+        var clanTeam = clan.Read<ClanTeam>();
+        if (clanTeam.ClanGuid.ToString().Equals(clanGuid, StringComparison.OrdinalIgnoreCase))
+        {
+          clanName = clanTeam.Name.ToString();
+          break;
+        }
+      }
+
+      sb.AppendLine($"  {clanName} ({clanGuid}): {count} key(s)");
+    }
+
+    ctx.Reply(sb.ToString());
+  }
+
+  public static void ListClanByName(ChatCommandContext ctx, string clanName)
+  {
+    var clanGuid = GetClanGuidFromName(clanName, ctx);
+    if (clanGuid == null)
+    {
+      return;
+    }
+
+    var keys = GetKeysForClan(clanGuid);
+    if (keys.Count == 0)
+    {
+      ctx.Reply($"No keys issued for clan '{clanName}'.");
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    sb.AppendLine($"Keys for '{clanName}':");
+    foreach (var (playerData, key) in keys)
+    {
+      var keyType = key.IsOwnerKey ? "OWNER" : (key.CanIgnoreClanLimit ? "ADMIN" : "MEMBER");
+      sb.AppendLine($"  {playerData.CharacterName} - {keyType}");
+    }
+
+    ctx.Reply(sb.ToString());
+  }
+
+  public static void RemovePlayerKey(ChatCommandContext ctx, string playerName)
+  {
+    if (!EntityService.TryFindPlayer(playerName, out var playerEntity, out var userEntity))
+    {
+      ctx.Reply($"Player '{playerName}' not found.");
+      return;
+    }
+
+    RevokeKey(ctx, userEntity);
+  }
+
+  public static void RemoveClanKeys(ChatCommandContext ctx)
+  {
+    var userEntity = ctx.Event.SenderUserEntity;
+    var user = userEntity.Read<User>();
+
+    if (user.ClanEntity.Equals(NetworkedEntity.Empty))
+    {
+      ctx.Reply("You are not in a clan.");
+      return;
+    }
+
+    var clanEntity = user.ClanEntity.GetEntityOnServer();
+    var clanTeam = clanEntity.Read<ClanTeam>();
+    var clanName = clanTeam.Name.ToString();
+    var clanGuid = clanTeam.ClanGuid.ToString();
+
+    if (!IsClanRegistered(clanGuid))
+    {
+      ctx.Reply($"Clan '{clanName}' is not registered with the keys system. Use .keys register.");
+      return;
+    }
+
+    if (!CanIssueKeys(userEntity, clanGuid))
+    {
+      ctx.Reply("Only the clan owner can revoke all keys.");
+      return;
+    }
+
+    RevokeAllKeysForClan(ctx, clanName);
   }
 
   public static void IssueKeysInRadius(ChatCommandContext ctx, Entity senderUserEntity, string clanName, float radius, bool canBypass)
