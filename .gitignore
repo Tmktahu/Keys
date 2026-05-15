@@ -6,3 +6,5 @@ AGENTS.md
 CLAUDE.md
 .claude
 .sln
+/ThunderStore
+PackThunderStore.ps1
