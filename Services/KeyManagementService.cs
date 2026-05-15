@@ -22,48 +22,96 @@ internal static class KeyManagementService
   private static Entity GetClanEntity(string identifier, ChatCommandContext ctx)
   {
     var clans = EntityService.GetEntitiesByComponentType<ClanTeam>();
-    Entity targetClan = Entity.Null;
-    List<(Entity Entity, string Guid)> matchingClans = new();
+
+    foreach (var clan in clans)
+    {
+      var clanTeam = clan.Read<ClanTeam>();
+      var clanGuid = clanTeam.ClanGuid.ToString();
+      if (clanGuid.Equals(identifier, StringComparison.OrdinalIgnoreCase))
+      {
+        return clan;
+      }
+    }
 
     foreach (var clan in clans)
     {
       var clanTeam = clan.Read<ClanTeam>();
       var clanName = clanTeam.Name.ToString();
-      var clanGuid = clanTeam.ClanGuid.ToString();
-
-      if (clanGuid.Equals(identifier, StringComparison.OrdinalIgnoreCase))
-      {
-        targetClan = clan;
-        break;
-      }
-
       if (clanName.Equals(identifier, StringComparison.OrdinalIgnoreCase))
       {
-        matchingClans.Add((clan, clanGuid));
+        return clan;
       }
     }
 
-    if (targetClan.Equals(Entity.Null) && matchingClans.Count == 1)
+    var match = System.Text.RegularExpressions.Regex.Match(identifier, @"^(.+?)\s+#(\d+)$");
+    if (match.Success)
     {
-      targetClan = matchingClans[0].Entity;
+      string baseName = match.Groups[1].Value;
+      int index = int.Parse(match.Groups[2].Value);
+
+      var matchingClans = new List<(Entity Entity, string Guid)>();
+      foreach (var clan in clans)
+      {
+        var clanTeam = clan.Read<ClanTeam>();
+        var clanName = clanTeam.Name.ToString();
+        if (clanName.Equals(baseName, StringComparison.OrdinalIgnoreCase))
+        {
+          matchingClans.Add((clan, clanTeam.ClanGuid.ToString()));
+        }
+      }
+
+      matchingClans.Sort((a, b) => string.Compare(a.Guid, b.Guid, StringComparison.OrdinalIgnoreCase));
+
+      if (matchingClans.Count == 0)
+      {
+        ctx.Reply($"Clan '{baseName}' not found.");
+        return Entity.Null;
+      }
+
+      if (index < 1 || index > matchingClans.Count)
+      {
+        ctx.Reply($"Index #{index} out of range. Only {matchingClans.Count} clan(s) matched '{baseName}'.");
+        return Entity.Null;
+      }
+
+      return matchingClans[index - 1].Entity;
     }
 
-    if (targetClan.Equals(Entity.Null) && matchingClans.Count > 1)
+    List<(Entity Entity, string Guid, string Name, string Motto, int MemberCount)> ambiguousClans = new();
+    foreach (var clan in clans)
     {
-      var errorMsg = $"Ambiguous clan name: '{identifier}' matches {matchingClans.Count} clans with GUIDs:\n";
-      errorMsg += string.Join("\n", matchingClans.Select((c, i) => $"  {i + 1}. {c.Guid}"));
+      var clanTeam = clan.Read<ClanTeam>();
+      var clanName = clanTeam.Name.ToString();
+      var clanGuid = clanTeam.ClanGuid.ToString();
+      if (clanName.Equals(identifier, StringComparison.OrdinalIgnoreCase))
+      {
+        var motto = clanTeam.Motto.ToString();
+        var memberCount = Core.EntityManager.GetBuffer<ClanMemberStatus>(clan).Length;
+        ambiguousClans.Add((clan, clanGuid, clanName, motto, memberCount));
+      }
+    }
+
+    if (ambiguousClans.Count == 1)
+    {
+      return ambiguousClans[0].Entity;
+    }
+
+    if (ambiguousClans.Count > 1)
+    {
+      ambiguousClans.Sort((a, b) => string.Compare(a.Guid, b.Guid, StringComparison.OrdinalIgnoreCase));
+      var errorMsg = $"Ambiguous clan name: '{identifier}' matches {ambiguousClans.Count} clans:\n";
+      for (int i = 0; i < ambiguousClans.Count; i++)
+      {
+        var motto = string.IsNullOrEmpty(ambiguousClans[i].Motto) ? "(no motto)" : $"\"{ambiguousClans[i].Motto}\"";
+        errorMsg += $"  {i + 1}. {ambiguousClans[i].Name} - {motto} ({ambiguousClans[i].MemberCount} members)\n";
+      }
+      errorMsg += $"Use the clan name with #N to specify, e.g. \"{identifier} #1\" or \"{identifier} #2\".";
       ctx.Reply(errorMsg);
       return Entity.Null;
     }
 
-    if (targetClan.Equals(Entity.Null))
-    {
-      var error = $"Clan '{identifier}' not found.";
-      ctx.Reply(error);
-      return Entity.Null;
-    }
-
-    return targetClan;
+    ctx.Reply($"Clan '{identifier}' not found.");
+    return Entity.Null;
   }
 
   internal static string GetClanGuidFromName(string clanName, ChatCommandContext ctx)
@@ -546,31 +594,79 @@ internal static class KeyManagementService
       var currentClanEntity = user.ClanEntity.GetEntityOnServer();
       var currentClanTeam = currentClanEntity.Read<ClanTeam>();
       var currentClanName = currentClanTeam.Name.ToString();
-      var currentClanGuid = currentClanTeam.ClanGuid.ToString();
-      ctx.Reply($"You are already in a clan: '{currentClanName}' ({currentClanGuid}). Leave it first.");
+      ctx.Reply($"You are already in a clan: '{currentClanName}'. Leave it first.");
       return;
+    }
+
+    string baseName = clanName;
+    int? clanIndex = null;
+
+    var match = System.Text.RegularExpressions.Regex.Match(clanName, @"^(.+?)\s+#(\d+)$");
+    if (match.Success)
+    {
+      baseName = match.Groups[1].Value;
+      clanIndex = int.Parse(match.Groups[2].Value);
     }
 
     var playerData = GetPlayerData(user);
     var matchingKeys = playerData.ClanKeys
-      .Where(k => k.ClanName.Equals(clanName, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(k.ClanGuid))
+      .Where(k => k.ClanName.Equals(baseName, StringComparison.OrdinalIgnoreCase) && !string.IsNullOrEmpty(k.ClanGuid))
+      .OrderBy(k => k.ClanGuid, StringComparer.OrdinalIgnoreCase)
       .ToList();
 
     if (matchingKeys.Count == 0)
     {
       var clansWithKeys = GetClansWithKeysForPlayer(userEntity);
-      ctx.Reply($"You don't have a key for clan '{clanName}'. You have keys for: {string.Join(", ", clansWithKeys)}");
+      ctx.Reply($"You don't have a key for clan '{baseName}'. You have keys for: {string.Join(", ", clansWithKeys)}");
+      return;
+    }
+
+    if (clanIndex.HasValue)
+    {
+      if (clanIndex.Value < 1 || clanIndex.Value > matchingKeys.Count)
+      {
+        ctx.Reply($"Index #{clanIndex.Value} out of range. You have {matchingKeys.Count} key(s) for clan '{baseName}'.");
+        return;
+      }
+
+      var targetKey = matchingKeys[clanIndex.Value - 1];
+      JoinClanByKey(ctx, userEntity, user, targetKey);
       return;
     }
 
     if (matchingKeys.Count > 1)
     {
-      var keyList = string.Join("\n", matchingKeys.Select((k, i) => $"  {i + 1}. {k.ClanGuid} - {k.ClanName}"));
-      ctx.Reply($"Ambiguous clan name '{clanName}'. You have keys for multiple clans:\n{keyList}");
+      var allClans = EntityService.GetEntitiesByComponentType<ClanTeam>();
+      var keyListBuilder = new StringBuilder();
+      keyListBuilder.AppendLine($"Ambiguous clan name '{baseName}'. You have keys for multiple clans:");
+      for (int i = 0; i < matchingKeys.Count; i++)
+      {
+        var key = matchingKeys[i];
+        string motto = "(no motto)";
+        int memberCount = 0;
+        foreach (var clan in allClans)
+        {
+          var clanTeam = clan.Read<ClanTeam>();
+          if (clanTeam.ClanGuid.ToString().Equals(key.ClanGuid, StringComparison.OrdinalIgnoreCase))
+          {
+            var m = clanTeam.Motto.ToString();
+            if (!string.IsNullOrEmpty(m)) motto = $"\"{m}\"";
+            memberCount = Core.EntityManager.GetBuffer<ClanMemberStatus>(clan).Length;
+            break;
+          }
+        }
+        keyListBuilder.AppendLine($"  {i + 1}. {key.ClanName} - {motto} ({memberCount} members)");
+      }
+      keyListBuilder.Append($"Use .keys use \"{baseName} #1\" or .keys use \"{baseName} #2\" to specify.");
+      ctx.Reply(keyListBuilder.ToString());
       return;
     }
 
-    var targetKey = matchingKeys[0];
+    JoinClanByKey(ctx, userEntity, user, matchingKeys[0]);
+  }
+
+  static void JoinClanByKey(ChatCommandContext ctx, Entity userEntity, User user, ClanKeyData targetKey)
+  {
     var targetClanGuid = targetKey.ClanGuid;
     var targetClanName = targetKey.ClanName;
 
@@ -744,12 +840,12 @@ internal static class KeyManagementService
     var user = userEntity.Read<User>();
     var playerData = GetPlayerData(user);
 
-    var keys = new List<(string ClanName, string ClanGuid, string KeyType)>();
+    var keys = new List<(string ClanName, string KeyType)>();
     foreach (var key in playerData.ClanKeys)
     {
       if (string.IsNullOrEmpty(key.ClanName) || string.IsNullOrEmpty(key.ClanGuid)) continue;
       var keyType = key.IsOwnerKey ? "OWNER" : (key.CanIgnoreClanLimit ? "ADMIN (bypasses limits)" : "MEMBER");
-      keys.Add((key.ClanName, key.ClanGuid, keyType));
+      keys.Add((key.ClanName, keyType));
     }
 
     if (keys.Count == 0)
@@ -760,9 +856,9 @@ internal static class KeyManagementService
 
     StringBuilder sb = new StringBuilder();
     sb.AppendLine("Keys you possess:");
-    foreach (var (clanName, clanGuid, keyType) in keys)
+    foreach (var (clanName, keyType) in keys)
     {
-      sb.AppendLine($"  Clan: {clanName} ({clanGuid}), Type: {keyType}");
+      sb.AppendLine($"  Clan: {clanName}, Type: {keyType}");
     }
     sb.AppendLine("Use <color=green>.keys use \"Clan Name\"</color> to join a clan.");
 
@@ -843,7 +939,7 @@ internal static class KeyManagementService
         }
       }
 
-      sb.AppendLine($"  {clanName} ({clanGuid}): {count} key(s)");
+      sb.AppendLine($"  {clanName}: {count} key(s)");
     }
 
     ctx.Reply(sb.ToString());

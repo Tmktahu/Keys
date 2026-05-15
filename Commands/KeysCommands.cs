@@ -189,10 +189,12 @@ internal static class KeyCommands
     }
     else if (target.Equals("all", StringComparison.OrdinalIgnoreCase))
     {
+      if (!ctx.IsAdmin) { ctx.Reply("That command is admin only."); return; }
       KeyManagementService.ListAll(ctx);
     }
     else
     {
+      if (!ctx.IsAdmin) { ctx.Reply("That command is admin only."); return; }
       KeyManagementService.ListClanByName(ctx, target);
     }
   }
