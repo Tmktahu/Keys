@@ -1,6 +1,6 @@
 ![](banner.png)
 
-[![AGPL-3.0 License](https://img.shields.io/static/v1?label=Licence&message=AGPL-3.0&color=green)](https://opensource.org/licenses/AGPL-3.0) [![GitHub Release](https://img.shields.io/static/v1?label=Version&message=1.0.0&color=blue)]() [![Patreon](https://img.shields.io/badge/Patreon-FFFFFF)](https://patreon.com/FrykesFiddlings)
+[![AGPL-3.0 License](https://img.shields.io/static/v1?label=Licence&message=AGPL-3.0&color=green)](https://opensource.org/licenses/AGPL-3.0) [![GitHub Release](https://img.shields.io/static/v1?label=Version&message=1.0.1&color=blue)]() [![Patreon](https://img.shields.io/badge/Patreon-FFFFFF)](https://patreon.com/FrykesFiddlings)
 
 This is the repository for Keys, coded by Fryke (fryke) on Discord.
 
@@ -63,7 +63,7 @@ This project is licensed under AGPL-3.0.
 
 Portions of code and design patterns in this project were inspired by or adapted from the following projects:
 
-  - KindredCommands <https://github.com/decaprisan/KindredCommands>
+  - KindredCommands <https://github.com/odjit/KindredCommands>
     Licensed under AGPL-3.0
 
 This is an independent project with its own purpose and functionality. It is not a fork, modification, or derivative of any of the above projects. Some utility code and patterns were referenced during development.
